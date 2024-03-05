@@ -1,6 +1,6 @@
 package com.gcu.trackerapp.controller;
 
-import com.gcu.trackerapp.model.User; // Make sure this import matches your User class's package
+import com.gcu.trackerapp.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,6 +20,6 @@ public class LogInController {
 
     @PostMapping("/login")
     public String processLogin(@ModelAttribute("user") User user, BindingResult result, Model model) {
-        return "redirect:/";
+        return "redirect:/concerts";
     }
 }

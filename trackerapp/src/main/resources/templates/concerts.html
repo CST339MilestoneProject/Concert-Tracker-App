@@ -1,0 +1,32 @@
+<!-- concerts.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/defaultTemplate}"></html>
+<head>
+    <meta charset="UTF-8">
+    <title>Concerts | Concert Tracker App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navigation bar code here -->
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/concerts}">Concerts</a>
+    </li>
+
+    <div class="container mt-4">
+        <h1>Concerts</h1>
+        <a th:href="@{/concerts/add}" class="btn btn-primary">Add Concert</a>
+        <div th:if="${concerts.isEmpty()}">
+            <p>No concerts added yet.</p>
+        </div>
+        <ul>
+            <li th:each="concert : ${concerts}">
+                <span th:text="${concert.artist}"></span> at <span th:text="${concert.venue}"></span>
+                <span th:text="${concert.setlist}"></span>
+                <!-- Add other concert details here -->
+            </li>
+        </ul>
+    </div>
+
+    <!-- Footer code here -->
+</body>
+</html>

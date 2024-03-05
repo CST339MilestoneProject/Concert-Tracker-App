@@ -23,6 +23,6 @@ public class RegistrationController {
     @PostMapping("/register")
     public String processRegistration(@ModelAttribute("user") User user, BindingResult result, Model model) {
 
-        return "redirect:/";
+        return "redirect:/concerts";
     }
 }

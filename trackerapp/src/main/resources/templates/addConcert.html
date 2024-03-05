@@ -1,0 +1,50 @@
+<!-- addConcert.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/defaultTemplate}"></html>
+<head>
+    <meta charset="UTF-8">
+    <title>Add Concert | Concert Tracker App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navigation bar code here -->
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/concerts}">Concerts</a>
+  </li>
+
+    <div class="container mt-4">
+        <h1>Add Concert</h1>
+        <form th:action="@{/concerts/add}" th:object="${concert}" method="post">
+            <!-- Form fields for concert details -->
+            <div class="form-group">
+                <label for="artist">Artist:</label>
+                <input type="text" id="artist" th:field="*{artist}" class="form-control" required>
+                <div class="text-danger" th:if="${#fields.hasErrors('artist')}" th:errors="*{artist}">
+                  Artist Error
+                </div>
+            </div>
+
+            <div class="form-group">
+              <label for="artist">Venue:</label>
+              <input type="text" id="venue" th:field="*{venue}" class="form-control" required>
+              <div class="text-danger" th:if="${#fields.hasErrors('venue')}" th:errors="*{venue}">
+                Venue Error
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label for="artist">SetList:</label>
+            <input type="text" id="setlist" th:field="*{setlist}" class="form-control" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('setlist')}" th:errors="*{setlist}">
+              SetList Error
+            </div>
+        </div>
+
+    </div>
+            <button type="submit" class="btn btn-success">Add Concert</button>
+        </form>
+    </div>
+
+    <!-- Footer code here -->
+</body>
+</html>
