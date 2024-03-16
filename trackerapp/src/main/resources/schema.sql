@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS concerts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
     artist VARCHAR(100),
     venue VARCHAR(100),
-    setlist TEXT
+    setlist TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );

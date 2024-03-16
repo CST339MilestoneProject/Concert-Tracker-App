@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/defaultTemplate}"></html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Concert | Concert Tracker App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Edit Concert</h1>
+    <form th:action="@{/concerts/edit/{id}(id=${concert.id})}" th:object="${concert}" method="post">
+        <input type="hidden" th:field="*{userId}" />
+        <div class="form-group">
+            <label for="artist">Artist</label>
+            <input type="text" class="form-control" id="artist" th:field="*{artist}" required>
+        </div>
+        <div class="form-group">
+            <label for="venue">Venue</label>
+            <input type="text" class="form-control" id="venue" th:field="*{venue}" required>
+        </div>
+        <div class="form-group">
+            <label for="setlist">Setlist</label>
+            <input type="text" class="form-control" id="setlist" th:field="*{setlist}" required>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+        <a href="/concerts" class="btn btn-primary">Back to Concerts</a>
+    </form>
+</div>
+</body>
+</html>

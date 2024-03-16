@@ -22,4 +22,26 @@ public class ConcertService {
     public Concert addConcert(Concert concert) {
         return concertRepository.save(concert);
     }
+
+    public Concert getConcertById(Long id) {
+        return concertRepository.findById(id).orElse(null);
+    }
+
+    public List<Concert> getConcertsByUserId(Long userId) {
+        return concertRepository.findByUserId(userId);
+    }
+
+    public Concert addConcertWithUser(Concert concert, Long userId) {
+        concert.setUserId(userId);
+        return concertRepository.save(concert);
+      }
+
+      public void deleteConcertById(Long id) {
+        concertRepository.deleteById(id);
+    }
+
+    public Concert updateConcert(Concert concert) {
+        return concertRepository.save(concert);
+    }
+
 }

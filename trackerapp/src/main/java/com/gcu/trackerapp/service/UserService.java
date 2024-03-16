@@ -14,4 +14,17 @@ public class UserService {
     public User registerUser(User user) {
         return userRepository.save(user);
     }
+
+    public boolean validateUser(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if(user != null && user.getPassword().equals(password)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 }
