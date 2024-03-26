@@ -2,12 +2,16 @@ package com.gcu.trackerapp.controller;
 
 import com.gcu.trackerapp.model.Concert;
 import com.gcu.trackerapp.service.ConcertService;
+import com.gcu.trackerapp.service.UserService;
 
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.http.HttpSession;
+
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,28 +24,19 @@ public class ConcertController {
     @Autowired
     private ConcertService concertService;
 
-    @GetMapping
-    public String showConcerts(Model model, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId != null) {
-            List<Concert> userConcerts = concertService.getConcertsByUserId(userId);
-            model.addAttribute("concerts", userConcerts);
-            model.addAttribute("userId", userId);
-        } else {
-            return "redirect:/login";
-        }
-        return "concerts";
-    }
 
-    @GetMapping("/add")
-    public String showAddConcertForm(Model model, HttpSession session) {
-    Long userId = (Long) session.getAttribute("userId");
-    if (userId == null) {
-        return "redirect:/login";
-        }
-    model.addAttribute("userId", userId);
-    model.addAttribute("concert", new Concert());
-    return "addConcert";
+    @Autowired
+    private UserService userService;
+
+    @GetMapping
+    public String showConcerts(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userService.findByUsername(username).getId();
+        List<Concert> userConcerts = concertService.getConcertsByUserId(userId);
+        model.addAttribute("concerts", userConcerts);
+        model.addAttribute("userId", userId);
+        return "concerts";
     }
 
 

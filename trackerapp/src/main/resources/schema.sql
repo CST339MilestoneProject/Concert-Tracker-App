@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100),
     phone_number VARCHAR(15),
     username VARCHAR(30),
-    password VARCHAR(100)
+    password VARCHAR(60),
+    enabled BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS concerts (

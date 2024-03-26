@@ -7,13 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gcu.trackerapp.model.Concert;
+import com.gcu.trackerapp.model.User;
 import com.gcu.trackerapp.repository.ConcertRepository;
+import com.gcu.trackerapp.repository.UserRepository;
 
 @Service
 public class ConcertService {
 
     @Autowired
     private ConcertRepository concertRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public Long findUserIdByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        return user != null ? user.getId() : null;
+    }
 
     public List<Concert> getAllConcerts() {
         return (List<Concert>) concertRepository.findAll();
