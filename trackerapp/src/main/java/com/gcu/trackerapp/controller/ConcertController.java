@@ -3,13 +3,9 @@ package com.gcu.trackerapp.controller;
 import com.gcu.trackerapp.model.Concert;
 import com.gcu.trackerapp.service.ConcertService;
 import com.gcu.trackerapp.service.UserService;
-
-import javax.servlet.http.HttpSession;
-
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -17,18 +13,19 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
-@RequestMapping("/concerts")
 public class ConcertController {
 
     @Autowired
     private ConcertService concertService;
 
-
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    // MVC Controller: Show concerts
+    @GetMapping("/concerts")
     public String showConcerts(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -39,8 +36,16 @@ public class ConcertController {
         return "concerts";
     }
 
+    // MVC Controller: Show concert details
+    @GetMapping("/concerts/{id}")
+    public String showConcertDetails(@PathVariable("id") Long id, Model model) {
+        Concert concert = concertService.getConcertById(id);
+        model.addAttribute("concert", concert);
+        return "currentConcert";
+    }
 
-    @PostMapping("/add")
+    // MVC Controller: Add concert
+    @PostMapping("/concerts/add")
     public String addConcert(@ModelAttribute("concert") Concert concert, BindingResult result, @RequestParam("userId") Long userId) {
         if (result.hasErrors()) {
             return "addConcert";
@@ -49,20 +54,15 @@ public class ConcertController {
         return "redirect:/concerts";
     }
 
-    @GetMapping("/{id}")
-    public String showConcertDetails(@PathVariable("id") Long id, Model model) {
-    Concert concert = concertService.getConcertById(id);
-    model.addAttribute("concert", concert);
-    return "currentConcert";
-    }
-
-    @DeleteMapping("/delete/{id}")
+    // MVC Controller: Delete concert
+    @GetMapping("/concerts/delete/{id}")
     public String deleteConcert(@PathVariable("id") Long id) {
         concertService.deleteConcertById(id);
         return "redirect:/concerts";
     }
 
-    @GetMapping("/edit/{id}")
+    // MVC Controller: Show edit concert form
+    @GetMapping("/concerts/edit/{id}")
     public String showEditConcertForm(@PathVariable("id") Long id, Model model) {
         Concert concert = concertService.getConcertById(id);
         if (concert != null) {
@@ -71,15 +71,30 @@ public class ConcertController {
         } else {
             return "redirect:/concerts";
         }
-}
-
-@PostMapping("/edit/{id}")
-public String updateConcert(@PathVariable("id") Long id, @ModelAttribute("concert") Concert concert, BindingResult result, Model model) {
-    if (result.hasErrors()) {
-        return "editConcert";
     }
-    concert.setId(id);
-    concertService.updateConcert(concert);
-    return "redirect:/concerts";
-}
+
+    // MVC Controller: Update concert
+    @PostMapping("/concerts/edit/{id}")
+    public String updateConcert(@PathVariable("id") Long id, @ModelAttribute("concert") Concert concert, BindingResult result) {
+        if (result.hasErrors()) {
+            return "editConcert";
+        }
+        concert.setId(id);
+        concertService.updateConcert(concert);
+        return "redirect:/concerts";
+    }
+
+    // REST API: Get all concerts
+    @GetMapping("/api/concerts")
+    public ResponseEntity<List<Concert>> getAllConcertsApi() {
+        List<Concert> concerts = concertService.getAllConcerts();
+        return concerts.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(concerts, HttpStatus.OK);
+    }
+
+    // REST API: Get concert by ID
+    @GetMapping("/api/concerts/{id}")
+    public ResponseEntity<Concert> getConcertByIdApi(@PathVariable("id") Long id) {
+        Concert concert = concertService.getConcertById(id);
+        return concert != null ? new ResponseEntity<>(concert, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }
