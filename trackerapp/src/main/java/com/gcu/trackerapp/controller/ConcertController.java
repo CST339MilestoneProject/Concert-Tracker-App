@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Controller for managing concert-related actions and RESTful services.
- */
 @Controller
 public class ConcertController {
 
@@ -27,30 +24,32 @@ public class ConcertController {
     @Autowired
     private UserService userService;
 
-    /**
-     * Displays a list of concerts to the user.
-     *
-     * @param model The model to be populated for the view.
-     * @return The name of the view to display.
-     */
     @GetMapping("/concerts")
     public String showConcerts(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Long userId = userService.findByUsername(username).getId();
-        List<Concert> userConcerts = concertService.getConcertsByUserId(userId);
+        List<Concert> userConcerts = concertService.getAllConcerts();
         model.addAttribute("concerts", userConcerts);
-        model.addAttribute("userId", userId);
         return "concerts";
     }
 
-    /**
-     * Displays details for a specific concert.
-     *
-     * @param id The ID of the concert to display.
-     * @param model The model to be populated for the view.
-     * @return The name of the view to display.
-     */
+    @GetMapping("/concerts/add")
+    public String showAddConcertForm(Model model) {
+        model.addAttribute("concert", new Concert());
+        return "addConcert";
+    }
+
+
+    @PostMapping("/concerts/add")
+    public String addConcert(@ModelAttribute("concert") Concert concert, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "addConcert";
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        concert.setUserId(userService.findByUsername(username).getId());
+        concertService.addConcert(concert);
+        return "redirect:/concerts";
+    }
+
     @GetMapping("/concerts/{id}")
     public String showConcertDetails(@PathVariable("id") Long id, Model model) {
         Concert concert = concertService.getConcertById(id);
@@ -58,42 +57,8 @@ public class ConcertController {
         return "currentConcert";
     }
 
-    /**
-     * Handles the submission of a new concert addition.
-     *
-     * @param concert The concert to be added.
-     * @param result The binding result for error handling.
-     * @param userId The ID of the user adding the concert.
-     * @return Redirect to the concerts list view.
-     */
-    @PostMapping("/concerts/add")
-    public String addConcert(@ModelAttribute("concert") Concert concert, BindingResult result, @RequestParam("userId") Long userId) {
-        if (result.hasErrors()) {
-            return "addConcert";
-        }
-        concertService.addConcertWithUser(concert, userId);
-        return "redirect:/concerts";
-    }
 
-    /**
-     * Handles the deletion of a concert.
-     *
-     * @param id The ID of the concert to delete.
-     * @return Redirect to the concerts list view.
-     */
-    @GetMapping("/concerts/delete/{id}")
-    public String deleteConcert(@PathVariable("id") Long id) {
-        concertService.deleteConcertById(id);
-        return "redirect:/concerts";
-    }
 
-    /**
-     * Displays the form for editing a concert.
-     *
-     * @param id The ID of the concert to edit.
-     * @param model The model to be populated for the view.
-     * @return The name of the view to display.
-     */
     @GetMapping("/concerts/edit/{id}")
     public String showEditConcertForm(@PathVariable("id") Long id, Model model) {
         Concert concert = concertService.getConcertById(id);
@@ -105,14 +70,6 @@ public class ConcertController {
         }
     }
 
-    /**
-     * Handles the submission of concert edits.
-     *
-     * @param id The ID of the concert to update.
-     * @param concert The updated concert details.
-     * @param result The binding result for error handling.
-     * @return Redirect to the concerts list view.
-     */
     @PostMapping("/concerts/edit/{id}")
     public String updateConcert(@PathVariable("id") Long id, @ModelAttribute("concert") Concert concert, BindingResult result) {
         if (result.hasErrors()) {
@@ -123,26 +80,21 @@ public class ConcertController {
         return "redirect:/concerts";
     }
 
-    /**
-     * Provides a list of all concerts via REST API.
-     *
-     * @return A ResponseEntity containing the list of concerts.
-     */
     @GetMapping("/api/concerts")
     public ResponseEntity<List<Concert>> getAllConcertsApi() {
         List<Concert> concerts = concertService.getAllConcerts();
-        return concerts.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(concerts, HttpStatus.OK);
+        return new ResponseEntity<>(concerts, concerts.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
-    /**
-     * Provides details of a specific concert by its ID via REST API.
-     *
-     * @param id The ID of the concert.
-     * @return A ResponseEntity containing the concert details.
-     */
     @GetMapping("/api/concerts/{id}")
     public ResponseEntity<Concert> getConcertByIdApi(@PathVariable("id") Long id) {
         Concert concert = concertService.getConcertById(id);
-        return concert != null ? new ResponseEntity<>(concert, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(concert, concert != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/api/concerts/delete/{id}")
+    public ResponseEntity<?> deleteConcertApi(@PathVariable("id") Long id) {
+        concertService.deleteConcertById(id);
+        return ResponseEntity.ok().build();
     }
 }
