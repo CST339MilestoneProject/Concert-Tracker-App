@@ -12,6 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+/**
+ * Security configuration class for the Spring Boot application.
+ * Configures authentication and authorization behaviors.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -19,6 +23,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private DataSource dataSource;
 
+    /**
+     * Configures HTTP security settings for the application.
+     *
+     * @param http HttpSecurity configuration.
+     * @throws Exception Throws exception if an error occurs.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -36,6 +46,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
+    /**
+     * Configures the global authentication manager with a JDBC data source and password encoder.
+     *
+     * @param auth AuthenticationManagerBuilder configuration.
+     * @throws Exception Throws exception if an error occurs.
+     */
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
@@ -45,11 +61,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authoritiesByUsernameQuery("select username, 'ROLE_USER' from users where username=?");
     }
 
+    /**
+     * Password encoder bean, using BCrypt hashing algorithm.
+     *
+     * @return A password encoder.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Custom authentication success handler bean.
+     *
+     * @return An authentication success handler.
+     */
     @Bean
     public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
         return new AuthSuccessHandler();
